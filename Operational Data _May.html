@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GLWACH Operational Dashboard – May 11, 2026</title>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --army-green:   #4b5320;
+      --army-tan:     #c8b560;
+      --army-dark:    #2b2e1e;
+      --army-light:   #f4f2eb;
+      --card-bg:      #ffffff;
+      --border:       #d4cfa8;
+      --text:         #1a1a1a;
+      --muted:        #6b6b5a;
+      --green-ok:     #3a7d44;
+      --yellow-warn:  #c9972a;
+      --red-alert:    #b33030;
+      --blue-info:    #2a5c8f;
+      --radius:       8px;
+      --shadow:       0 2px 8px rgba(0,0,0,.12);
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--army-light);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--army-green);
+      color: #fff;
+      padding: 18px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 4px solid var(--army-tan);
+    }
+    header .logo-block { display: flex; align-items: center; gap: 14px; }
+    header .shield {
+      width: 52px; height: 52px;
+      background: var(--army-tan);
+      clip-path: polygon(50% 0%,100% 15%,100% 70%,50% 100%,0% 70%,0% 15%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    header h1 { font-size: 1.25rem; font-weight: 700; line-height: 1.3; }
+    header h1 span { display: block; font-size: .8rem; font-weight: 400; opacity: .85; }
+    header .meta { text-align: right; font-size: .82rem; opacity: .88; }
+    header .meta strong { display: block; font-size: .95rem; }
+
+    /* ── Quote banner ── */
+    .quote-banner {
+      background: var(--army-dark);
+      color: var(--army-tan);
+      text-align: center;
+      padding: 10px 24px;
+      font-style: italic;
+      font-size: .88rem;
+      letter-spacing: .02em;
+    }
+
+    /* ── Nav tabs ── */
+    nav.tabs {
+      display: flex; flex-wrap: wrap;
+      background: var(--army-green);
+      padding: 0 16px;
+      gap: 2px;
+    }
+    nav.tabs button {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,.75);
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .03em;
+      border-bottom: 3px solid transparent;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+    nav.tabs button:hover { color: #fff; background: rgba(255,255,255,.08); }
+    nav.tabs button.active {
+      color: var(--army-tan);
+      border-bottom-color: var(--army-tan);
+      background: rgba(255,255,255,.06);
+    }
+
+    /* ── Main content ── */
+    main { padding: 20px 24px 40px; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Section title ── */
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--army-green);
+      border-left: 5px solid var(--army-tan);
+      padding-left: 10px;
+      margin-bottom: 16px;
+    }
+    .section-title span { font-size: .8rem; font-weight: 400; color: var(--muted); margin-left: 8px; }
+
+    /* ── Grid helpers ── */
+    .grid { display: grid; gap: 16px; }
+    .grid-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      padding: 16px 18px;
+    }
+    .card h3 {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+    .card .big-num {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--army-green);
+      line-height: 1.1;
+    }
+    .card .sub { font-size: .78rem; color: var(--muted); margin-top: 3px; }
+
+    /* ── Stat row ── */
+    .stat-row { display: flex; justify-content: space-between; align-items: center;
+                padding: 6px 0; border-bottom: 1px solid #f0ede0; font-size: .85rem; }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-row .label { color: var(--muted); }
+    .stat-row .val { font-weight: 700; color: var(--army-dark); }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: .74rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+    .badge-green  { background: #e6f4ea; color: var(--green-ok); }
+    .badge-yellow { background: #fef9e7; color: var(--yellow-warn); }
+    .badge-red    { background: #fdecea; color: var(--red-alert); }
+    .badge-blue   { background: #e8f0fa; color: var(--blue-info); }
+    .badge-gray   { background: #f0ede0; color: var(--muted); }
+
+    /* ── Progress bar ── */
+    .progress-wrap { margin-top: 8px; }
+    .progress-label { display: flex; justify-content: space-between;
+                      font-size: .78rem; margin-bottom: 3px; color: var(--muted); }
+    .progress-bar { height: 10px; background: #e8e6d8; border-radius: 20px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 20px; transition: width .6s ease; }
+    .fill-green  { background: var(--green-ok); }
+    .fill-yellow { background: var(--yellow-warn); }
+    .fill-red    { background: var(--red-alert); }
+    .fill-blue   { background: var(--blue-info); }
+    .fill-tan    { background: var(--army-tan); }
+
+    /* ── Action items table ── */
+    .ai-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .ai-table th {
+      background: var(--army-green);
+      color: #fff;
+      text-align: left;
+      padding: 9px 12px;
+      font-size: .78rem;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .ai-table td { padding: 8px 12px; border-bottom: 1px solid #ece9d8; vertical-align: top; }
+    .ai-table tr:last-child td { border-bottom: none; }
+    .ai-table tr:nth-child(even) td { background: #fafaf5; }
+    .ai-table tr:hover td { background: #f3f0e0; }
+
+    /* ── Alert box ── */
+    .alert-box {
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      font-size: .84rem;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .alert-box .icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .alert-yellow { background: #fef9e7; border-left: 4px solid var(--yellow-warn); }
+    .alert-red    { background: #fdecea; border-left: 4px solid var(--red-alert); }
+    .alert-blue   { background: #e8f0fa; border-left: 4px solid var(--blue-info); }
+    .alert-green  { background: #e6f4ea; border-left: 4px solid var(--green-ok); }
+
+    /* ── Two-col split ── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+
+    /* ── List ── */
+    ul.dash-list { list-style: none; padding: 0; }
+    ul.dash-list li {
+      padding: 5px 0 5px 18px;
+      border-bottom: 1px solid #f0ede0;
+      font-size: .84rem;
+      position: relative;
+    }
+    ul.dash-list li::before { content: '▸'; position: absolute; left: 0; color: var(--army-tan); }
+    ul.dash-list li:last-child { border-bottom: none; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 14px;
+      background: var(--army-dark);
+      color: rgba(255,255,255,.5);
+      font-size: .74rem;
+      margin-top: 30px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      header { padding: 14px 16px; }
+      main { padding: 14px 12px 30px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════ -->
+<header>
+  <div class="logo-block">
+    <div class="shield">🏥</div>
+    <h1>
+      General Leonard Wood Community Hospital
+      <span>Deputy Commander for Readiness — Operations Dashboard</span>
+    </h1>
+  </div>
+  <div class="meta">
+    <strong>LTC Kenneatta Jasper</strong>
+    Monthly Meeting · May 11, 2026
+  </div>
+</header>
+
+<div class="quote-banner">
+  "Readiness in military medicine is not simply about being prepared — it is about being the reason our Soldiers, families, and communities thrive."
+</div>
+
+<!-- ══════════════════════════════════════════
+     NAV TABS
+══════════════════════════════════════════ -->
+<nav class="tabs">
+  <button class="active" onclick="showTab('overview',this)">📋 Overview</button>
+  <button onclick="showTab('action',this)">✅ Action Items</button>
+  <button onclick="showTab('pubhealth',this)">🏥 Public Health</button>
+  <button onclick="showTab('afwc',this)">💪 AFWC</button>
+  <button onclick="showTab('enviro',this)">🌿 Environmental</button>
+  <button onclick="showTab('hearing',this)">👂 Hearing</button>
+  <button onclick="showTab('chem',this)">⚗️ Chem Surety</button>
+  <button onclick="showTab('occmed',this)">🩺 Occ Med</button>
+  <button onclick="showTab('nursing',this)">💉 PH Nursing</button>
+  <button onclick="showTab('ctmc',this)">🏨 CTMC</button>
+  <button onclick="showTab('srp',this)">🎖️ SRP</button>
+  <button onclick="showTab('ppsl',this)">🦿 PPSL</button>
+  <button onclick="showTab('meb',this)">📁 IDES/MEB</button>
+</nav>
+
+<!-- ══════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════ -->
+<main>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  OVERVIEW                           │
+       └─────────────────────────────────────┘ -->
+  <div id="overview" class="tab-panel active">
+    <p class="section-title">Hospital Command Overview <span>As of 11 May 2026</span></p>
+
+    <!-- Key numbers strip -->
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>SRP Members Processed (MTD)</h3>
+        <div class="big-num">1,431</div>
+        <div class="sub">Avg 65/day · Avg wait 1 hr</div>
+      </div>
+      <div class="card">
+        <h3>Total Occ-Med Patients (Apr)</h3>
+        <div class="big-num">1,583</div>
+        <div class="sub">CDTF 549 · Field 739 · OH Clinic 303</div>
+      </div>
+      <div class="card">
+        <h3>AFWC Clients (MTD)</h3>
+        <div class="big-num">232</div>
+        <div class="sub">20 coaching · 4 nutrition sessions</div>
+      </div>
+      <div class="card">
+        <h3>Chem Surety Students</h3>
+        <div class="big-num">549</div>
+        <div class="sub">544 cleared · 4 returned to instruction</div>
+      </div>
+      <div class="card">
+        <h3>Hearing Tests (MTD)</h3>
+        <div class="big-num">934</div>
+        <div class="sub">281 annual surveillance audiograms</div>
+      </div>
+      <div class="card">
+        <h3>IDES/MEB Cases</h3>
+        <div class="big-num">70</div>
+        <div class="sub">56 IDES · 12 TDRL · 1 LDES · 1 ABCMR</div>
+      </div>
+      <div class="card">
+        <h3>PH Nursing Encounters</h3>
+        <div class="big-num">236</div>
+        <div class="sub">15 reportable cases · 12 animal bites</div>
+      </div>
+      <div class="card">
+        <h3>Immunizations (SRP MTD)</h3>
+        <div class="big-num">741</div>
+        <div class="sub">Avg 33/day</div>
+      </div>
+    </div>
+
+    <!-- Upcoming key events -->
+    <p class="section-title">⚡ Key Upcoming Events</p>
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Critical Dates – May/Jun 2026</h3>
+        <div class="stat-row"><span class="label">DHA SAV / TJC Pre-Extension Survey</span><span class="badge badge-red">12–14 MAY</span></div>
+        <div class="stat-row"><span class="label">Internal MASCAL Exercise</span><span class="badge badge-yellow">13 MAY</span></div>
+        <div class="stat-row"><span class="label">NCO Induction – Names Due</span><span class="badge badge-yellow">08 MAY</span></div>
+        <div class="stat-row"><span class="label">MASCAL Events</span><span class="badge badge-yellow">18–22 MAY</span></div>
+        <div class="stat-row"><span class="label">Field Sanitation Course</span><span class="badge badge-blue">18–21 MAY</span></div>
+        <div class="stat-row"><span class="label">CAF Audits 100% Complete</span><span class="badge badge-blue">30 MAY</span></div>
+        <div class="stat-row"><span class="label">NIRSC/RSC Meeting</span><span class="badge badge-blue">29 MAY</span></div>
+        <div class="stat-row"><span class="label">Performance Award Submissions</span><span class="badge badge-blue">1 MAY – 15 JUN</span></div>
+        <div class="stat-row"><span class="label">Next Command Meeting</span><span class="badge badge-gray">08 JUN 2026</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Staffing Alerts</h3>
+        <div class="alert-box alert-red">
+          <span class="icon">🚨</span>
+          <div><strong>SRP:</strong> No provider coverage 25 MAY – 05 JUN (Provider out). Multiple staff absences overlap.</div>
+        </div>
+        <div class="alert-box alert-yellow">
+          <span class="icon">⚠️</span>
+          <div><strong>CTMC:</strong> Operating at 89% staffing. Summer surge imminent. Changing CNOIC leadership during orientation.</div>
+        </div>
+        <div class="alert-box alert-yellow">
+          <span class="icon">⚠️</span>
+          <div><strong>PPSL:</strong> Upcoming Audiologist vacancy 01 AUG. Projected NCO shortage within department.</div>
+        </div>
+        <div class="alert-box alert-yellow">
+          <span class="icon">⚠️</span>
+          <div><strong>Occ Med:</strong> RN wait 3.5 wks, MD wait ~1 month. New PA starts 24 JUL; New RN starts 01 JUN.</div>
+        </div>
+        <div class="alert-box alert-blue">
+          <span class="icon">ℹ️</span>
+          <div><strong>IDES/MEB:</strong> DMIS referral issue (6166 → 0075) unresolved. No new MEB referrals since move to Bldg 1018.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- On-going programs -->
+    <p class="section-title">📌 Ongoing Program Status</p>
+    <div class="grid grid-3">
+      <div class="card">
+        <h3>Hospital Transition</h3>
+        <div class="stat-row"><span class="label">Status</span><span class="badge badge-yellow">On-Going</span></div>
+        <div class="stat-row"><span class="label">CAF Audit Target</span><span class="badge badge-blue">100% by 30 MAY</span></div>
+      </div>
+      <div class="card">
+        <h3>DPMAP</h3>
+        <div class="stat-row"><span class="label">Period</span><span class="val">1 APR – 30 SEP 26</span></div>
+        <div class="stat-row"><span class="label">Status</span><span class="badge badge-yellow">Interim Plans</span></div>
+      </div>
+      <div class="card">
+        <h3>Performance Awards</h3>
+        <div class="stat-row"><span class="label">Window</span><span class="val">1 MAY – 15 JUN 26</span></div>
+        <div class="stat-row"><span class="label">Goal</span><span class="val">2% CIVPAY</span></div>
+      </div>
+      <div class="card">
+        <h3>RRC CPI Training</h3>
+        <div class="stat-row"><span class="label">Audience</span><span class="val">All Supervisors</span></div>
+        <div class="stat-row"><span class="label">Platform</span><span class="val">JKO – 3 hr virtual</span></div>
+      </div>
+      <div class="card">
+        <h3>FY27 Flu Campaign</h3>
+        <div class="stat-row"><span class="label">Status</span><span class="badge badge-yellow">Drafting FRAGO</span></div>
+        <div class="stat-row"><span class="label">Next</span><span class="val">Identify Flu Rodeo location</span></div>
+      </div>
+      <div class="card">
+        <h3>Unit Patient Advocate</h3>
+        <div class="stat-row"><span class="label">Status</span><span class="badge badge-red">New Req – Pending</span></div>
+        <div class="stat-row"><span class="label">Note</span><span class="val">Primary + Alternate per Section</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  ACTION ITEMS                       │
+       └─────────────────────────────────────┘ -->
+  <div id="action" class="tab-panel">
+    <p class="section-title">Action Items Tracker <span>CUI Category: OPSEC</span></p>
+    <div class="card" style="overflow-x:auto;">
+      <table class="ai-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Action Item / Task</th>
+            <th>POC / AO</th>
+            <th>Status</th>
+            <th>Expectation / Next Step</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Hospital Transition</td>
+            <td>All Sections</td>
+            <td><span class="badge badge-yellow">On-Going</span></td>
+            <td>30 MAY 100% CAF audits</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>DHA SAV – TJC Pre-Extension Survey</td>
+            <td>All Sections</td>
+            <td><span class="badge badge-red">12–14 MAY</span></td>
+            <td>Infection prevention & Facilities services focus</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>GLWACH Hearing Tasker</td>
+            <td>DPH</td>
+            <td><span class="badge badge-yellow">On-Going</span></td>
+            <td>Training — May</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Tasker 25-134 RRC CPI Training</td>
+            <td>All Supervisors</td>
+            <td><span class="badge badge-yellow">On-Going</span></td>
+            <td>JKO DHA-US1372 Virtual – All Staff (3 hrs)</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>DPMAP</td>
+            <td>All Supervisors</td>
+            <td><span class="badge badge-blue">Interim Plans</span></td>
+            <td>PY26 Interim: 1 APR – 30 SEP 26 (Effective 1 DEC 26)</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Performance Awards</td>
+            <td>All Supervisors</td>
+            <td><span class="badge badge-blue">1 MAY – 15 JUN</span></td>
+            <td>Goal: 2% CIVPAY — FY25 guidance</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td>MASCAL Events</td>
+            <td>All Sections</td>
+            <td><span class="badge badge-red">18–22 MAY</span></td>
+            <td>Internal Exercise – 13 MAY 26</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td>Tasker 26-014 NCO Induction Ceremony</td>
+            <td>All Sections</td>
+            <td><span class="badge badge-red">Names Due 08 MAY</span></td>
+            <td>Provide 2 NCOs (CPL–SFC) for NCO Response</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td>FY27 Flu Campaign</td>
+            <td>PHN</td>
+            <td><span class="badge badge-yellow">Drafting FRAGO</span></td>
+            <td>Identify GLWCH Flu Rodeo location; update POCs</td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td>Continuous Performance Improvement</td>
+            <td>All Sections</td>
+            <td><span class="badge badge-yellow">On-Going</span></td>
+            <td>Provide quick wins to QMD on daily process improvements</td>
+          </tr>
+          <tr>
+            <td>11</td>
+            <td>Unit Patient Advocate Representative</td>
+            <td>All Sections</td>
+            <td><span class="badge badge-red">New Req – Pending</span></td>
+            <td>Primary + Alternate per section. Cannot be leadership. Training TBD.</td>
+          </tr>
+          <tr>
+            <td>12</td>
+            <td>Backfills Request (72C)</td>
+            <td>DPH</td>
+            <td><span class="badge badge-yellow">Pending Response</span></td>
+            <td>8/31 – 10/23/2026 — Sent to MEDCOM for region support</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  PUBLIC HEALTH                      │
+       └─────────────────────────────────────┘ -->
+  <div id="pubhealth" class="tab-panel">
+    <p class="section-title">Public Health <span>CPT Vu / John Jackson — Chief, DPH</span></p>
+    <div class="grid grid-3" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Staff Managed</h3>
+        <div class="big-num">43</div>
+        <div class="sub">MIL: 13 &nbsp;|&nbsp; CIV: 26 &nbsp;|&nbsp; CTR: 4</div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>MIL</span><span>13</span></div>
+          <div class="progress-bar"><div class="progress-fill fill-green" style="width:30%"></div></div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>CIV</span><span>26</span></div>
+          <div class="progress-bar"><div class="progress-fill fill-blue" style="width:60%"></div></div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>CTR</span><span>4</span></div>
+          <div class="progress-bar"><div class="progress-fill fill-tan" style="width:10%"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Command Briefings / Advisor Meetings</h3>
+        <div class="stat-row"><span class="label">PEC Meeting</span><span class="val">4 / 7 / 26</span></div>
+        <div class="stat-row"><span class="label">PCHD Meeting</span><span class="val">4 / 10 / 26</span></div>
+        <div class="stat-row"><span class="label">Advisories Issued</span><span class="badge badge-blue">On File</span></div>
+      </div>
+      <div class="card">
+        <h3>Programs Overseen</h3>
+        <ul class="dash-list">
+          <li>Industrial Hygiene</li>
+          <li>AFWC</li>
+          <li>Environmental Health</li>
+          <li>Hearing Conservation</li>
+          <li>Chem Surety</li>
+          <li>Occ Med / Health</li>
+          <li>PH Nursing / EPI</li>
+          <li>Health Physics / DECON</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert-box alert-blue">
+      <span class="icon">ℹ️</span>
+      <div>Backfills Request (72C): 08/31/2026 – 10/23/2026 — Submitted to MEDCOM for regional support. Awaiting response.</div>
+    </div>
+  </div>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  AFWC                               │
+       └─────────────────────────────────────┘ -->
+  <div id="afwc" class="tab-panel">
+    <p class="section-title">Army Fitness &amp; Wellness Center (AFWC) <span>CPT Vu / SFC Laswell</span></p>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Total Clients (MTD)</h3>
+        <div class="big-num">232</div>
+      </div>
+      <div class="card">
+        <h3>Body Composition Assessments</h3>
+        <div class="big-num">173</div>
+      </div>
+      <div class="card">
+        <h3>Biofeedback (Stress)</h3>
+        <div class="big-num">12</div>
+      </div>
+      <div class="card">
+        <h3>Health Coaching Sessions</h3>
+        <div class="big-num">20</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Program Participation Breakdown</h3>
+        <div class="stat-row"><span class="label">Metabolic Testing</span><span class="val">7</span></div>
+        <div class="stat-row"><span class="label">Body Composition Assessment</span><span class="val">173</span></div>
+        <div class="stat-row"><span class="label">VO₂ Max / Cardiorespiratory Testing</span><span class="val">4</span></div>
+        <div class="stat-row"><span class="label">Biofeedback for Stress</span><span class="val">12</span></div>
+        <div class="stat-row"><span class="label">Health Coaching Sessions</span><span class="val">20</span></div>
+        <div class="stat-row"><span class="label">Nutrition Education Sessions</span><span class="val">4</span></div>
+        <div class="stat-row"><span class="label">Stress/Sleep Management Sessions</span><span class="val">1</span></div>
+      </div>
+      <div class="card">
+        <h3>Outreach &amp; Unit Support</h3>
+        <div class="stat-row"><span class="label">Unit Briefings Conducted</span><span class="val">6</span></div>
+        <div class="stat-row"><span class="label">Soldiers Referred by Providers/Command</span><span class="badge badge-blue">Tracked</span></div>
+        <div class="stat-row"><span class="label">Soldiers Enrolled in Wellness Programs</span><span class="badge badge-blue">Tracked</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  ENVIRONMENTAL HEALTH               │
+       └─────────────────────────────────────┘ -->
+  <div id="enviro" class="tab-panel">
+    <p class="section-title">Environmental Health <span>MAJ Graham — As of 6 May 2026</span></p>
+    <div class="grid grid-3" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Inspections</h3>
+        <div class="stat-row"><span class="label">Food Service (Mar)</span><span class="badge badge-green">26 / 26 ✔</span></div>
+        <div class="stat-row"><span class="label">Barracks (Mar)</span><span class="badge badge-green">23 / 23 ✔</span></div>
+        <div class="stat-row"><span class="label">Barber / Beauty (Mar)</span><span class="badge badge-green">2 / 2 ✔</span></div>
+        <div class="stat-row"><span class="label">Gymnasium</span><span class="badge badge-green">3 / 3 ✔</span></div>
+        <div class="stat-row"><span class="label">CYS Facility (Apr)</span><span class="badge badge-green">5 / 5 ✔</span></div>
+        <div class="stat-row"><span class="label">Annual CHSI</span><span class="badge badge-green">7 / 7 ✔</span></div>
+      </div>
+      <div class="card">
+        <h3>Water Surveillance</h3>
+        <div class="stat-row"><span class="label">Drinking Water Samples (Apr)</span><span class="val">24</span></div>
+        <div class="stat-row"><span class="label">DUWL</span><span class="badge badge-yellow">Due in June</span></div>
+      </div>
+      <div class="card">
+        <h3>Vector Surveillance</h3>
+        <div class="stat-row"><span class="label">Tick Drags (Mar)</span><span class="val">28 Drags</span></div>
+        <div class="stat-row"><span class="label">Work Orders Submitted</span><span class="val">23</span></div>
+        <div class="stat-row"><span class="label">Mosquito Surveillance</span><span class="badge badge-blue">Begins June</span></div>
+        <div class="stat-row"><span class="label">Env. Complaint Investigation</span><span class="badge badge-green">NSTR</span></div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Field Sanitation Course</h3>
+        <div class="stat-row"><span class="label">Last</span><span class="val">9–12 Feb (6 pax)</span></div>
+        <div class="stat-row"><span class="label">Next</span><span class="val">18–21 May (6 signed up)</span></div>
+      </div>
+      <div class="card">
+        <h3>Food Handler Class</h3>
+        <div class="stat-row"><span class="label">Last</span><span class="val">6 May (9 pax trained)</span></div>
+        <div class="stat-row"><span class="label">Next</span><span class="val">3 June</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  HEARING                            │
+       └─────────────────────────────────────┘ -->
+  <div id="hearing" class="tab-panel">
+    <p class="section-title">Hearing Conservation <span>CPT Ramirez</span></p>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Hearing Tests Completed</h3>
+        <div class="big-num">934</div>
+      </div>
+      <div class="card">
+        <h3>Annual Surveillance Audiograms</h3>
+        <div class="big-num">281</div>
+      </div>
+      <div class="card">
+        <h3>Noise Hazard Assessments</h3>
+        <div class="big-num">—</div>
+        <div class="sub">Range assessments conducted</div>
+      </div>
+      <div class="card">
+        <h3>Program Compliance</h3>
+        <div class="big-num">—</div>
+        <div class="sub">Units with hearing program compliance tracked</div>
+      </div>
+    </div>
+    <div class="alert-box alert-yellow">
+      <span class="icon">⚠️</span>
+      <div><strong>GLWACH Hearing Tasker:</strong> On-going — Training target: May 2026. GLWACH Tasker assigned to DPH.</div>
+    </div>
+  </div>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  CHEM SURETY                        │
+       └─────────────────────────────────────┘ -->
+  <div id="chem" class="tab-panel">
+    <p class="section-title">Chemical Surety Program <span>John Jackson</span></p>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Total Students</h3>
+        <div class="big-num">549</div>
+      </div>
+      <div class="card">
+        <h3>Cleared Without Incident</h3>
+        <div class="big-num">544</div>
+        <div class="sub"><span class="badge badge-green">99.1% Clear Rate</span></div>
+      </div>
+      <div class="card">
+        <h3>Returned to Instruction</h3>
+        <div class="big-num">4</div>
+      </div>
+      <div class="card">
+        <h3>CPRP Personnel</h3>
+        <div class="big-num">47</div>
+        <div class="sub">11 CPRP + 1 candidate</div>
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Inspections &amp; Reviews</h3>
+        <div class="stat-row"><span class="label">3rd Qtr FY26 Inspection</span><span class="badge badge-green">Completed 13–17 Apr</span></div>
+        <div class="stat-row"><span class="label">4th Qtr Inspection</span><span class="val">Aug 17–20</span></div>
+        <div class="stat-row"><span class="label">CWC Treaty SAV</span><span class="val">Aug 3–5</span></div>
+        <div class="stat-row"><span class="label">CIMRA 26/3 MPE AAR</span><span class="val">Scheduled 4/11</span></div>
+      </div>
+      <div class="card">
+        <h3>Personnel (CMA / MRTL / PHEO / MEM)</h3>
+        <div class="stat-row"><span class="label">CMA</span><span class="val">2 (LTC Rodriquez covering via telehealth until Sep 26)</span></div>
+        <div class="stat-row"><span class="label">MRTL</span><span class="val">3 (Dr. Douglas being resubmitted)</span></div>
+        <div class="stat-row"><span class="label">PHEO</span><span class="val">3</span></div>
+        <div class="stat-row"><span class="label">MEM</span><span class="val">1</span></div>
+      </div>
+    </div>
+    <div class="alert-box alert-yellow">
+      <span class="icon">⚠️</span>
+      <div>PHASE training to be completed by CDTF for staff on FAR. Next classes TBD — T2COM revising program.</div>
+    </div>
+  </div>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  OCC MED                            │
+       └─────────────────────────────────────┘ -->
+  <div id="occmed" class="tab-panel">
+    <p class="section-title">Occupational Medicine / Health <span>Dr. McCall / Samantha Visser</span></p>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>CDTF Students</h3>
+        <div class="big-num">549</div>
+      </div>
+      <div class="card">
+        <h3>Field Mission</h3>
+        <div class="big-num">739</div>
+      </div>
+      <div class="card">
+        <h3>OH Clinic Total</h3>
+        <div class="big-num">303</div>
+      </div>
+      <div class="card">
+        <h3>Total Patients (Apr)</h3>
+        <div class="big-num">1,583</div>
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Surveillance &amp; Screening</h3>
+        <div class="stat-row"><span class="label">AD In-Processing</span><span class="val">91</span></div>
+        <div class="stat-row"><span class="label">FF – RN</span><span class="val">8</span></div>
+        <div class="stat-row"><span class="label">FF – MD</span><span class="val">8</span></div>
+        <div class="stat-row"><span class="label">PHPP – RN</span><span class="val">6</span></div>
+        <div class="stat-row"><span class="label">PHPP – MD</span><span class="val">22</span></div>
+        <div class="stat-row"><span class="label">TB Screening</span><span class="val">26</span></div>
+      </div>
+      <div class="card">
+        <h3>Workplace Health</h3>
+        <div class="stat-row"><span class="label">Fit Tests Completed</span><span class="val">53</span></div>
+        <div class="stat-row"><span class="label">Work-Related Injury Evaluations</span><span class="val">2</span></div>
+        <div class="stat-row"><span class="label">Fit for Duty</span><span class="val">0</span></div>
+        <div class="stat-row"><span class="label">Return to Work</span><span class="val">3</span></div>
+        <div class="stat-row"><span class="label">Self-Reporting</span><span class="val">8</span></div>
+        <div class="stat-row"><span class="label">Annual Employee Health (RN)</span><span class="val">23</span></div>
+        <div class="stat-row"><span class="label">Annual Employee Health (MD)</span><span class="val">17</span></div>
+        <div class="stat-row"><span class="label">Spirometry</span><span class="val">5</span></div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="alert-box alert-yellow">
+        <span class="icon">⚠️</span>
+        <div><strong>Access to Care:</strong> RN wait — 3.5 weeks. MD wait — ~1 month. MSA workspace noise concerns ongoing.</div>
+      </div>
+      <div class="alert-box alert-blue">
+        <span class="icon">ℹ️</span>
+        <div><strong>Future Ops:</strong> Workforce immunization plan, new blood-borne pathogen plan, New PA starts 24 JUL, New RN starts 01 JUN. Awards due by 15 JUN.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  PH NURSING / EPI                   │
+       └─────────────────────────────────────┘ -->
+  <div id="nursing" class="tab-panel">
+    <p class="section-title">Public Health Nursing / Epidemiology <span>CPT Holt</span></p>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Encounters / Consultations</h3>
+        <div class="big-num">236</div>
+      </div>
+      <div class="card">
+        <h3>Referrals</h3>
+        <div class="big-num">12</div>
+      </div>
+      <div class="card">
+        <h3>Reportable Cases</h3>
+        <div class="big-num">15</div>
+      </div>
+      <div class="card">
+        <h3>ARDS</h3>
+        <div class="big-num">45</div>
+      </div>
+    </div>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Inspections &amp; Surveillance</h3>
+        <div class="stat-row"><span class="label">CYS CDC Inspections</span><span class="val">4</span></div>
+        <div class="stat-row"><span class="label">CYS FCC Inspections</span><span class="val">4</span></div>
+        <div class="stat-row"><span class="label">SNAPs</span><span class="val">40</span></div>
+        <div class="stat-row"><span class="label">MIAT</span><span class="val">3</span></div>
+        <div class="stat-row"><span class="label">Animal Bites</span><span class="val">12</span></div>
+        <div class="stat-row"><span class="label">Outbreaks / Clusters / Trends</span><span class="badge badge-green">0</span></div>
+      </div>
+      <div class="card">
+        <h3>Prevention &amp; Outreach</h3>
+        <div class="stat-row"><span class="label">Health Education Briefs / Initiatives</span><span class="val">3</span></div>
+        <div class="stat-row"><span class="label">Community Partner Events</span><span class="val">1</span></div>
+        <div class="stat-row"><span class="label">Stakeholder Meetings</span><span class="val">6</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  CTMC                               │
+       └─────────────────────────────────────┘ -->
+  <div id="ctmc" class="tab-panel">
+    <p class="section-title">CTMC <span>MAJ Rein / Tabbatha Runner</span></p>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Staffing Level</h3>
+        <div class="big-num">89%</div>
+        <div class="progress-wrap">
+          <div class="progress-label"><span>Operational Capacity</span><span>89%</span></div>
+          <div class="progress-bar"><div class="progress-fill fill-yellow" style="width:89%"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Providers</h3>
+        <div class="big-num">4 / 5</div>
+        <div class="sub">80% — 1 vacancy</div>
+      </div>
+      <div class="card">
+        <h3>LPNs</h3>
+        <div class="big-num">4 / 5</div>
+        <div class="sub">80% — 1 vacancy</div>
+      </div>
+      <div class="card">
+        <h3>MSAs</h3>
+        <div class="big-num">2 / 3</div>
+        <div class="sub">67% — 1 vacancy</div>
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Operational Notes</h3>
+        <ul class="dash-list">
+          <li>POCT tests increasing — decreased wait time for results</li>
+          <li>Patient volume growing as TOMs close; summer surge imminent</li>
+          <li>Trend: UP compared to last month</li>
+          <li>CAF compliance: 95%</li>
+          <li>MIL evals due: JUN (1 NCO), AUG (1 NCO)</li>
+          <li>PI project: Med records room → conference room begun</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Issues &amp; Concerns</h3>
+        <div class="alert-box alert-yellow">
+          <span class="icon">⚠️</span>
+          <div>NLPs account for ~1/5 of all encounters — slowing return-to-training timelines.</div>
+        </div>
+        <div class="alert-box alert-red">
+          <span class="icon">🚨</span>
+          <div>Physical exams booked ~1 month out. Changing CNOIC during orientation creates continuity risk.</div>
+        </div>
+        <div class="alert-box alert-blue">
+          <span class="icon">ℹ️</span>
+          <div>TOMS without providers: 1-48, 2-10, 58th. 35th TOMS provider leaving this summer. Internal Medicine underlap — MAJ Tobin covering referral reviews.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  SRP                                │
+       └─────────────────────────────────────┘ -->
+  <div id="srp" class="tab-panel">
+    <p class="section-title">Soldier Readiness Processing (SRP) <span>Adelle George / SFC Azevedo — 01 Apr – 06 May 2026</span></p>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>SMs Processed (22 work days)</h3>
+        <div class="big-num">1,431</div>
+        <div class="sub">Closed 4 days due to move</div>
+      </div>
+      <div class="card">
+        <h3>Daily Average</h3>
+        <div class="big-num">65</div>
+        <div class="sub">SMs per day</div>
+      </div>
+      <div class="card">
+        <h3>Avg Wait Time</h3>
+        <div class="big-num">1 hr</div>
+      </div>
+      <div class="card">
+        <h3>Total Immunizations</h3>
+        <div class="big-num">741</div>
+        <div class="sub">Avg 33/day · Some stock-outs due to move</div>
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Support Breakdown</h3>
+        <div class="stat-row"><span class="label">Provider Patient Load</span><span class="val">713</span></div>
+        <div class="stat-row"><span class="label">Provider Daily Average</span><span class="val">32 patients</span></div>
+        <div class="stat-row"><span class="label">BOLC Classes Supported</span><span class="val">2</span></div>
+        <div class="stat-row"><span class="label">SMs per BOLC Class (avg)</span><span class="val">45</span></div>
+        <div class="stat-row"><span class="label">Units Scheduled / Supported</span><span class="val">4</span></div>
+        <div class="stat-row"><span class="label">Avg SMs per Unit</span><span class="val">58</span></div>
+      </div>
+      <div class="card">
+        <h3>⚠️ Upcoming Absences</h3>
+        <div class="alert-box alert-yellow">
+          <span class="icon">📅</span>
+          <div>RN out: 14–22 MAY 26</div>
+        </div>
+        <div class="alert-box alert-yellow">
+          <span class="icon">📅</span>
+          <div>MSA out: 18–22 MAY 26</div>
+        </div>
+        <div class="alert-box alert-red">
+          <span class="icon">🚨</span>
+          <div><strong>NO PROVIDER COVERAGE:</strong> Provider out 25 MAY – 05 JUN 26</div>
+        </div>
+        <div class="alert-box alert-yellow">
+          <span class="icon">📅</span>
+          <div>68W at school: 25 MAY – 10 JUN 26</div>
+        </div>
+        <div class="alert-box alert-yellow">
+          <span class="icon">📅</span>
+          <div>LPN out: 01 JUN – 04 JUL 26</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  PPSL                               │
+       └─────────────────────────────────────┘ -->
+  <div id="ppsl" class="tab-panel">
+    <p class="section-title">PPSL (Physical / Allied Health) <span>CPT Frey / SFC Bostic</span></p>
+    <div class="alert-box alert-yellow" style="margin-bottom:16px;">
+      <span class="icon">⚠️</span>
+      <div>Data skewed due to ongoing hospital transition. Figures reflect best available MTD data.</div>
+    </div>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>Audiology Visits</h3>
+        <div class="big-num">87</div>
+        <div class="sub">First available: 17 days</div>
+      </div>
+      <div class="card">
+        <h3>Chiropractic Visits</h3>
+        <div class="big-num">456</div>
+        <div class="sub">First available: 25 days</div>
+      </div>
+      <div class="card">
+        <h3>OT Visits</h3>
+        <div class="big-num">196</div>
+        <div class="sub">First available: 11 days</div>
+      </div>
+      <div class="card">
+        <h3>PT Visits (GLWCH + CTMC)</h3>
+        <div class="big-num">2,461</div>
+        <div class="sub">GLWCH: 707 · CTMC: 1,754 · DA avail: 48 hrs</div>
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>No-Show Rates</h3>
+        <div class="stat-row"><span class="label">Audiology</span><span class="val">4.60%</span></div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill fill-yellow" style="width:46%"></div></div>
+        </div>
+        <div class="stat-row" style="margin-top:8px;"><span class="label">Chiropractic</span><span class="val">3.73%</span></div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill fill-green" style="width:37%"></div></div>
+        </div>
+        <div class="stat-row" style="margin-top:8px;"><span class="label">OT</span><span class="val">6.12%</span></div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill fill-yellow" style="width:61%"></div></div>
+        </div>
+        <div class="stat-row" style="margin-top:8px;"><span class="label">PT</span><span class="val">1.70%</span></div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill fill-green" style="width:17%"></div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Priorities &amp; Concerns</h3>
+        <ul class="dash-list">
+          <li>CTMC Staff Stabilization</li>
+          <li>CAF Folders completion</li>
+          <li>TJC Preparation</li>
+          <li>Staff Transition Preparation</li>
+          <li>Hiring Audiologist</li>
+          <li>Awards processing</li>
+        </ul>
+        <div class="alert-box alert-red" style="margin-top:12px;">
+          <span class="icon">🚨</span>
+          <div>Audiologist vacancy effective 01 AUG 26. Projected shortage of NCOs within department.</div>
+        </div>
+        <div class="stat-row"><span class="label">PT Direct Access Fill Rate</span><span class="badge badge-yellow">74.1%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ┌─────────────────────────────────────┐
+       │  IDES/MEB                           │
+       └─────────────────────────────────────┘ -->
+  <div id="meb" class="tab-panel">
+    <p class="section-title">IDES / MEB <span>Mr. Storie — MEB Phase Avg: 67 days</span></p>
+    <div class="grid grid-4" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>IDES-MEB Cases</h3>
+        <div class="big-num">56</div>
+      </div>
+      <div class="card">
+        <h3>LDES Cases</h3>
+        <div class="big-num">1</div>
+      </div>
+      <div class="card">
+        <h3>TDRL Cases</h3>
+        <div class="big-num">12</div>
+      </div>
+      <div class="card">
+        <h3>ABCMR Cases</h3>
+        <div class="big-num">1</div>
+      </div>
+    </div>
+    <div class="grid grid-2" style="margin-bottom:16px;">
+      <div class="card">
+        <h3>MTD Activity</h3>
+        <div class="stat-row"><span class="label">MEBs Started</span><span class="val">3</span></div>
+        <div class="stat-row"><span class="label">MEBs Completed (Sent to PEB/VA)</span><span class="val">5</span></div>
+        <div class="stat-row"><span class="label">Returned to Duty</span><span class="val">0</span></div>
+        <div class="stat-row"><span class="label">Remote NARSUMs for other MTFs</span><span class="val">5</span></div>
+        <div class="stat-row"><span class="label">Cases per PEBLO</span><span class="val">17</span></div>
+        <div class="stat-row"><span class="label">MEB Phase Avg Duration</span><span class="badge badge-yellow">67 Days</span></div>
+      </div>
+      <div class="card">
+        <h3>Issues &amp; Concerns</h3>
+        <div class="alert-box alert-red">
+          <span class="icon">🚨</span>
+          <div><strong>DMIS Issue (6166):</strong> No new MEB referrals received since move to Bldg 1018. Referral Management &amp; Healthcare Ops working with Genesis team. Work order submitted — not yet resolved.</div>
+        </div>
+        <div class="alert-box alert-yellow">
+          <span class="icon">⚠️</span>
+          <div>Facilities and IMD have outstanding work orders in Bldg 1018.</div>
+        </div>
+        <div class="alert-box alert-blue">
+          <span class="icon">ℹ️</span>
+          <div><strong>Future Ops:</strong> PEBLOs may be assigned to NG/RES remote cases. Ft. Campbell PEBLO workload assist pending. MEB Providers continuing remote NARSUM support for other MTFs.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  GLWACH Operational Dashboard &nbsp;|&nbsp; May 11, 2026 &nbsp;|&nbsp; CUI Category: OPSEC &nbsp;|&nbsp; For Official Use Only
+</footer>
+
+<script>
+  function showTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
