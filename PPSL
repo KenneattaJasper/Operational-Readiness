@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PPSL Operations Button</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .ppsl-card {
+      width: 360px;
+      background-color: #002B5C; /* DHA Navy Blue */
+      color: #ffffff;
+      border-left: 8px solid #D4A017; /* Army Gold */
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.28);
+      transition: all 0.3s ease;
+    }
+
+    .ppsl-card:hover {
+      background-color: #0A4A8A;
+      transform: translateY(-4px);
+      box-shadow: 0 10px 24px rgba(10, 74, 138, 0.45);
+    }
+
+    .ppsl-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+
+    .ppsl-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0 0 8px 0;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .ppsl-subtitle {
+      font-size: 14px;
+      color: #d9d9d9;
+      margin-bottom: 18px;
+    }
+
+    .status {
+      display: inline-block;
+      background-color: #107C10;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 20px;
+      margin-bottom: 18px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .metric {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 13px;
+      color: #D4A017;
+    }
+
+    .metric span {
+      font-size: 13px;
+      color: #ffffff;
+    }
+
+    .ppsl-button {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      background-color: #D4A017;
+      color: #002B5C;
+      font-weight: 800;
+      padding: 14px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .ppsl-button:hover {
+      background-color: #f0c94d;
+      color: #001f42;
+      box-shadow: 0 0 12px rgba(212, 160, 23, 0.75);
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="ppsl-card">
+    <div class="ppsl-icon">🛡️⚕️</div>
+
+    <h2 class="ppsl-title">Physical Performance Service Line</h2>
+
+    <div class="ppsl-subtitle">
+      PT • OT • Audiology • Chiropractic
+    </div>
+
+    <div class="status">🟢 MISSION READY</div>
+
+    <div class="metrics">
+      <div class="metric">
+        <strong>PT Access</strong>
+        <span>4 Day Avg</span>
+      </div>
+
+      <div class="metric">
+        <strong>OT Caseload</strong>
+        <span>87 Active</span>
+      </div>
+
+      <div class="metric">
+        <strong>Audiology</strong>
+        <span>96% Capacity</span>
+      </div>
+
+      <div class="metric">
+        <strong>Chiropractic</strong>
+        <span>128 Visits</span>
+      </div>
+    </div>
+
+    <a class="ppsl-button" href="#">
+      OPEN PPSL OPERATIONS
+    </a>
+  </div>
+
+</body>
+</html>
